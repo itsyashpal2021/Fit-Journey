@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(cors({ credentials: true, origin: true }));
 
 // posts
-app.post("/api/getNutritions", async (req: Request, res: Response) => {
+app.post("/getNutritions", async (req: Request, res: Response) => {
   try {
     const ingr = req.body.recipeItems;
     const appId = "28ecb5b6";
