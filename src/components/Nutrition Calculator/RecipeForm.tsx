@@ -1,7 +1,6 @@
 import { Button, LinearProgress, Stack, TextField } from "@mui/material";
 import { FC, useRef, useState } from "react";
 import axios from "axios";
-import { ROUTES } from "../Consts";
 import NutritionInfo from "./NutritionInfo";
 import { BaseProps } from "../../App";
 
@@ -17,10 +16,15 @@ const NutritionCalculator: FC<BaseProps> = (props) => {
       if (!input || !input.length) return;
 
       setLoading(true);
-      const recipeItems = input.split("\n");
-      const res = await axios.post(ROUTES.CALCULATE_NUTRITION, { recipeItems });
 
-      setResult(res.data);
+      const ingr = input.split("\n");
+      const appId = "28ecb5b6";
+      const appKey = "9ab6a1e97450519bb811564933a6e9ff";
+      const baseURL = "https://api.edamam.com/api/nutrition-details?app_id=";
+      const url = baseURL.concat(appId, "&app_key=", appKey);
+      const { data } = await axios.post(url, { ingr });
+
+      setResult(data);
       setLoading(false);
     } catch (error) {
       console.error(error);
@@ -38,7 +42,7 @@ const NutritionCalculator: FC<BaseProps> = (props) => {
       >
         <TextField
           variant="outlined"
-          label="Enter Meal, separate individual items by new line"
+          label="Enter Recipe, separate individual items by new line"
           inputRef={inputRef}
           multiline
           focused
