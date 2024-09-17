@@ -1,18 +1,17 @@
-require("dotenv").config();
+import dotenv from "dotenv";
 import axios from "axios";
-import { Application, Request, Response } from "express";
-const express = require("express");
-const path = require("path");
-const cors = require("cors");
+import express from "express";
+import path from "path";
+import cors from "cors";
 
-const app: Application = express();
+const app = express();
 const port = process.env.PORT || 3000;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors({ credentials: true, origin: true }));
 
 // posts
-app.post("/getNutritions", async (req: Request, res: Response) => {
+app.post("/getNutritions", async (req, res) => {
   try {
     const ingr = req.body.recipeItems;
     const appId = "28ecb5b6";
@@ -31,7 +30,7 @@ app.post("/getNutritions", async (req: Request, res: Response) => {
 if (process.env.NODE_ENV === "production") {
   app.use(express.static("client/dist"));
 
-  app.get("*", (req: Request, res: Response) =>
+  app.get("*", (_req, res) =>
     res.sendFile(path.resolve(__dirname, "client", "dist", "index.html"))
   );
 }

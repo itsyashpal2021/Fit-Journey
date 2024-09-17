@@ -1,43 +1,34 @@
-import {
-  Alert,
-  Button,
-  LinearProgress,
-  Slide,
-  Snackbar,
-  Stack,
-  TextField,
-} from "@mui/material";
-import { useRef, useState } from "react";
-import axios, { AxiosError } from "axios";
+import { Button, LinearProgress, Stack, TextField } from "@mui/material";
+import { FC, useRef, useState } from "react";
+import axios from "axios";
 import { ROUTES } from "../Consts";
 import NutritionInfo from "./NutritionInfo";
+import { BaseProps } from "../../App";
 
-const NutritionCalculator = () => {
+const NutritionCalculator: FC<BaseProps> = (props) => {
   const [result, setResult] = useState<NutritionInfo | null>(null);
-  const [snackBarMessage, setSnackbarMessage] = useState<string | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // fetches nutrition values for recipe.
+  // fetches nutrition values for input recipe.
   const onSubmit = async () => {
     try {
-      const recipeItems = inputRef.current?.value?.trim().split("\n");
-      if (!recipeItems || !recipeItems.length) return;
+      const input = inputRef.current?.value.trim();
+      if (!input || !input.length) return;
 
       setLoading(true);
-      const res = await axios.post(ROUTES.CALCULATE_NUTRITION, {
-        recipeItems,
-      });
+      const recipeItems = input.split("\n");
+      const res = await axios.post(ROUTES.CALCULATE_NUTRITION, { recipeItems });
+
       setResult(res.data);
       setLoading(false);
     } catch (error) {
-      if (error instanceof AxiosError) setSnackbarMessage(error.message);
-      setLoading(false);
+      console.error(error);
+      props.setError("Something went wrong");
       setResult(null);
+      setLoading(false);
     }
   };
-
-  const closeSnackbar = () => setSnackbarMessage(undefined);
 
   return (
     <Stack gap={2} p={2}>
@@ -55,22 +46,6 @@ const NutritionCalculator = () => {
         <Button variant="contained" onClick={onSubmit}>
           Submit
         </Button>
-        <Snackbar
-          open={snackBarMessage !== undefined}
-          TransitionComponent={(props) => <Slide {...props} direction="left" />}
-          autoHideDuration={2000}
-          anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-          onClose={closeSnackbar}
-        >
-          <Alert
-            onClose={closeSnackbar}
-            severity="error"
-            variant="filled"
-            sx={{ width: "100%" }}
-          >
-            {snackBarMessage}
-          </Alert>
-        </Snackbar>
       </Stack>
       {loading && <LinearProgress color="warning" />}
       <NutritionInfo result={result} />
